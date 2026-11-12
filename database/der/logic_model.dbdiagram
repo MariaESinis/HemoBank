@@ -1,0 +1,275 @@
+{
+  "version": "3.0.0",
+  "darkMode": true,
+  "gridEnabling": false,
+  "currentViewName": null,
+  "defaultView": {
+    "detailLevel": "All",
+    "relationshipMode": "All",
+    "tablePositions": [
+      {
+        "name": "donor_status",
+        "schemaName": "public",
+        "x": 16,
+        "y": 320
+      },
+      {
+        "name": "donor",
+        "schemaName": "public",
+        "x": 360,
+        "y": 80
+      },
+      {
+        "name": "appointment",
+        "schemaName": "public",
+        "x": 808,
+        "y": 16
+      },
+      {
+        "name": "exam_status",
+        "schemaName": "public",
+        "x": 808,
+        "y": 352
+      },
+      {
+        "name": "exam",
+        "schemaName": "public",
+        "x": 1248,
+        "y": 176
+      },
+      {
+        "name": "donation_status",
+        "schemaName": "public",
+        "x": 360,
+        "y": 592
+      },
+      {
+        "name": "donation",
+        "schemaName": "public",
+        "x": 808,
+        "y": 632
+      },
+      {
+        "name": "employee",
+        "schemaName": "public",
+        "x": 360,
+        "y": 872
+      },
+      {
+        "name": "employee_status",
+        "schemaName": "public",
+        "x": 16,
+        "y": 1144
+      },
+      {
+        "name": "blood_bag",
+        "schemaName": "public",
+        "x": 1248,
+        "y": 584
+      },
+      {
+        "name": "bag_history",
+        "schemaName": "public",
+        "x": 1616,
+        "y": 536
+      },
+      {
+        "name": "inventory",
+        "schemaName": "public",
+        "x": 808,
+        "y": 1200
+      },
+      {
+        "name": "inventory_status",
+        "schemaName": "public",
+        "x": 360,
+        "y": 1344
+      }
+    ],
+    "tableGroupCollapseStates": [],
+    "stickyNoteLayouts": [],
+    "referencePaths": [
+      {
+        "firstFieldNames": [
+          "dst_id"
+        ],
+        "firstTableName": "donor_status",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "don_dst_id"
+        ],
+        "secondTableName": "donor",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "don_id"
+        ],
+        "firstTableName": "donor",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "app_don_id"
+        ],
+        "secondTableName": "appointment",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "exs_id"
+        ],
+        "firstTableName": "exam_status",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "exm_exs_id"
+        ],
+        "secondTableName": "exam",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "dnt_id"
+        ],
+        "firstTableName": "donation",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "exm_dnt_id"
+        ],
+        "secondTableName": "exam",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "dts_id"
+        ],
+        "firstTableName": "donation_status",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "dnt_dts_id"
+        ],
+        "secondTableName": "donation",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "don_id"
+        ],
+        "firstTableName": "donor",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "dnt_don_id"
+        ],
+        "secondTableName": "donation",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "emp_id"
+        ],
+        "firstTableName": "employee",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "dnt_emp_id"
+        ],
+        "secondTableName": "donation",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "ems_id"
+        ],
+        "firstTableName": "employee_status",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "emp_ems_id"
+        ],
+        "secondTableName": "employee",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "dnt_id"
+        ],
+        "firstTableName": "donation",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "bbg_dnt_id"
+        ],
+        "secondTableName": "blood_bag",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "inv_id"
+        ],
+        "firstTableName": "inventory",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "bbg_inv_id"
+        ],
+        "secondTableName": "blood_bag",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "bbg_id"
+        ],
+        "firstTableName": "blood_bag",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "bgh_bbg_id"
+        ],
+        "secondTableName": "bag_history",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "ivs_id"
+        ],
+        "firstTableName": "inventory_status",
+        "firstSchemaName": "public",
+        "firstRelation": "1",
+        "secondFieldNames": [
+          "inv_ivs_id"
+        ],
+        "secondTableName": "inventory",
+        "secondSchemaName": "public",
+        "secondRelation": "*",
+        "checkPoints": []
+      }
+    ]
+  },
+  "views": {}
+}

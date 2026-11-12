@@ -1,0 +1,172 @@
+TABLE donor_status {
+    dst_id              INTEGER [PK]
+    dst_name            VARCHAR(50)
+    dst_description     VARCHAR(255)
+
+    dst_created_at      TIMESTAMPTZ
+    dst_updated_at      TIMESTAMPTZ
+    dst_deleted_at      TIMESTAMPTZ [NULL]
+}
+
+TABLE donor {
+    don_id              INTEGER [PK]
+    don_name            VARCHAR(150)
+    don_cpf             CHAR(11)
+    don_birth_date      TIMESTAMPTZ
+    don_gender          VARCHAR(20)
+    don_phone           VARCHAR(20)
+    don_email           VARCHAR(150)
+
+    don_created_at      TIMESTAMPTZ
+    don_updated_at      TIMESTAMPTZ
+    don_deleted_at      TIMESTAMPTZ [NULL]
+
+    don_dst_id          INTEGER [REF: > donor_status.dst_id]
+}
+
+TABLE appointment {
+    app_id              INTEGER [PK]
+    app_date            TIMESTAMPTZ
+    app_time            TIMESTAMPTZ
+    app_observations    VARCHAR(500)
+    
+    app_created_at      TIMESTAMPTZ
+    app_updated_at      TIMESTAMPTZ
+    app_deleted_at      TIMESTAMPTZ [NULL]
+
+    app_don_id          INTEGER [REF: > donor.don_id]
+}
+
+TABLE exam_status {
+    exs_id              INTEGER [PK]
+    exs_name            VARCHAR(50)
+    exs_description     VARCHAR(255)
+
+    exs_created_at      TIMESTAMPTZ
+    exs_updated_at      TIMESTAMPTZ
+    exs_deleted_at      TIMESTAMPTZ [NULL]
+}
+
+TABLE exam {
+    exm_id              INTEGER [PK]
+    exm_type            VARCHAR(200)
+    exm_result          VARCHAR(1000)
+    exm_date            TIMESTAMPTZ
+    exm_observations    VARCHAR(1000)
+
+    exm_created_at      TIMESTAMPTZ
+    exm_updated_at      TIMESTAMPTZ
+    exm_deleted_at      TIMESTAMPTZ [NULL]
+
+    exm_exs_id          INTEGER [REF: > exam_status.exs_id]
+    exm_dnt_id          INTEGER [REF: > donation.dnt_id]
+}
+
+TABLE donation_status {
+    dts_id              INTEGER [PK]
+    dts_name            VARCHAR(50)
+    dts_description     VARCHAR(255)
+
+    dts_created_at      TIMESTAMPTZ
+    dts_updated_at      TIMESTAMPTZ
+    dts_deleted_at      TIMESTAMPTZ [NULL]
+}
+
+TABLE donation {
+    dnt_id              INTEGER [PK]
+    dnt_donation_date   TIMESTAMPTZ
+    dnt_quantity_ml     INTEGER
+    dnt_donation_type   VARCHAR(50)
+    dnt_observations    VARCHAR(500)
+    dnt_bag_type        VARCHAR(10)
+    dnt_type            VARCHAR(20)
+    dnt_expiration_date TIMESTAMPTZ
+
+    dnt_created_at      TIMESTAMPTZ
+    dnt_updated_at      TIMESTAMPTZ
+    dnt_deleted_at      TIMESTAMPTZ [NULL]
+
+    dnt_dts_id          INTEGER [REF: > donation_status.dts_id]
+    dnt_don_id          INTEGER [REF: > donor.don_id]
+    dnt_emp_id          INTEGER [REF: > employee.emp_id]
+}
+
+TABLE employee {
+    emp_id              INTEGER [PK]
+    emp_name            VARCHAR(150)
+    emp_cpf             CHAR(11)
+    emp_position        VARCHAR(100)
+    emp_phone           VARCHAR(20)
+    emp_email           VARCHAR(150)
+    emp_hire_date       TIMESTAMPTZ
+    
+    emp_salary          DECIMAL(10,2)
+    emp_created_at      TIMESTAMPTZ
+    emp_updated_at      TIMESTAMPTZ
+    emp_deleted_at      TIMESTAMPTZ [NULL]
+
+    emp_ems_id          INTEGER [REF: > employee_status.ems_id]
+}
+
+TABLE employee_status {
+    ems_id              INTEGER [PK]
+    ems_name            VARCHAR(50)
+    ems_description     VARCHAR(255)
+
+    ems_created_at      TIMESTAMPTZ
+    ems_updated_at      TIMESTAMPTZ
+    ems_deleted_at      TIMESTAMPTZ [NULL]
+}
+
+TABLE blood_bag {
+    bbg_id              INTEGER [PK]
+    bbg_generated_date  TIMESTAMPTZ
+    bbg_quantity_ml     INTEGER
+    bbg_type            VARCHAR(20)
+    bbg_observations    VARCHAR(500)
+    bbg_labeling        VARCHAR(10)
+    bbg_expiration_date TIMESTAMPTZ
+    
+    bbg_created_at      TIMESTAMPTZ
+    bbg_updated_at      TIMESTAMPTZ
+    bbg_deleted_at      TIMESTAMPTZ [NULL]
+
+    bbg_dnt_id          INTEGER [REF: > donation.dnt_id]
+    bbg_inv_id          INTEGER [REF: > inventory.inv_id]
+}
+
+TABLE bag_history {
+    bgh_id              INTEGER [PK]
+    bgh_entry_date      TIMESTAMPTZ
+    bgh_exit_date       TIMESTAMPTZ [NULL]
+    bgh_reason          VARCHAR(255)
+
+    bgh_created_at      TIMESTAMPTZ
+    bgh_updated_at      TIMESTAMPTZ
+    bgh_deleted_at      TIMESTAMPTZ [NULL]
+
+    bgh_bbg_id          INTEGER [REF: > blood_bag.bbg_id]
+}
+
+TABLE inventory {
+    inv_id              INTEGER [PK]
+    inv_labeling        VARCHAR(10)
+    inv_type            VARCHAR(20)
+
+    inv_quantity        INTEGER
+    inv_created_at      TIMESTAMPTZ
+    inv_updated_at      TIMESTAMPTZ
+    inv_deleted_at      TIMESTAMPTZ [NULL]
+
+    inv_ivs_id          INTEGER [REF: > inventory_status.ivs_id]
+}
+
+TABLE inventory_status {
+    ivs_id              INTEGER [PK]
+    ivs_name            VARCHAR(50)
+    ivs_description     VARCHAR(255)
+
+    ivs_created_at      TIMESTAMPTZ
+    ivs_updated_at      TIMESTAMPTZ
+    ivs_deleted_at      TIMESTAMPTZ [NULL]
+}
