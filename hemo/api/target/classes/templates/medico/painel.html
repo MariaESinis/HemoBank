@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel do Doador</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+        .btn-logout { background-color: #555; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Área Exclusiva do MEDICO 🩸</h1>
+        <a href="/hemocentro/logout" class="btn-logout">Sair</a>
+    </div>
+    <h3>Olá! Aqui você pode:</h3>
+    <ul>
+        <li>Ver seu histórico de doações</li>
+    </ul>
+
+    <div class="card">
+    <h3>Cadastrar Nova Bolsa de Sangue</h3>
+    <form id="form-bolsa">
+        <label>Tipagem Sanguínea:</label>
+        <input type="text" id="tipagem" placeholder="Ex: O+" required>
+
+        <label>Quantidade (ml):</label>
+        <input type="number" id="quantidadeMl" value="450" required>
+
+        <label>Data de Validade:</label>
+        <input type="datetime-local" id="dataValidade" required>
+
+        <label>Observações:</label>
+        <input type="text" id="observacoes" placeholder="Ex: Aprovado nos testes">
+
+        <button type="submit">Cadastrar Bolsa</button>
+    </form>
+
+
+
+
+    <section class="meus-agendamentos" style="margin-top: 30px;">
+    <h2>Meus Agendamentos</h2>
+    <table border="1" cellpadding="10" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th>Data</th>
+                <th>Horário</th>
+                <th>Observações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="ag : ${agendamentos}">
+                <td th:text="${ag.ageData}">Data</td>
+                <td th:text="${ag.ageHorario}">Horário</td>
+                <td th:text="${ag.ageObservacoes}">Observações</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(agendamentos)}">
+                <td colspan="3" style="text-align: center;">Nenhum agendamento encontrado.</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+</div>
+
+<script>
+    document.getElementById('form-bolsa').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const novaBolsa = {
+            tipagem: document.getElementById('tipagem').value,
+            quantidadeMl: parseInt(document.getElementById('quantidadeMl').value),
+            dataColeta: new Date().toISOString(),
+            dataValidade: new Date(document.getElementById('dataValidade').value).toISOString(),
+            observacoes: document.getElementById('observacoes').value
+        };
+
+        const response = await fetch('/api/bolsas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(novaBolsa)
+        });
+
+        if (response.ok) {
+            alert('Bolsa cadastrada com sucesso!');
+            document.getElementById('form-bolsa').reset();
+        } else {
+            alert('Erro ao cadastrar bolsa.');
+        }
+    });
+</script>
+</body>
+</html>

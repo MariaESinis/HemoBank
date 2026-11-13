@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel do Doador - Hemoglobank</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <header>
+        <h1>Bem-vindo ao Painel do Doador</h1>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Sair</button>
+        </form>
+    </header>
+
+    <main class="container">
+        <section class="meus-agendamentos" style="margin-top: 30px;">
+    <h2>Meus Agendamentos</h2>
+    <table border="1" cellpadding="10" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th>Data</th>
+                <th>Horário</th>
+                <th>Observações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="ag : ${agendamentos}">
+                <td th:text="${ag.ageData}">Data</td>
+                <td th:text="${ag.ageHorario}">Horário</td>
+                <td th:text="${ag.ageObservacoes}">Observações</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(agendamentos)}">
+                <td colspan="3" style="text-align: center;">Nenhum agendamento encontrado.</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+    </main>
+
+    <script>
+        document.getElementById('formAgendamento').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const dataHora = document.getElementById('dataHora').value;
+
+            const response = await fetch('/api/agendamentos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dataHora: dataHora })
+            });
+
+            if (response.ok) {
+                alert('Agendamento realizado com sucesso!');
+                location.reload();
+            } else {
+                alert('Erro ao realizar agendamento.');
+            }
+        });
+    </script>
+</body>
+</html>

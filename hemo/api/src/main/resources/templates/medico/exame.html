@@ -1,0 +1,108 @@
+<div class="card">
+    <h3>Gerenciamento de Exames (Painel Médico)</h3>
+    
+    <!-- Formulário para cadastrar novo exame vinculado a uma Doação -->
+    <form id="form-exame" style="margin-bottom: 20px;">
+        <h4>Cadastrar Exame para Doação</h4>
+        <label>ID da Doação:</label>
+        <input type="number" id="doaId" placeholder="ID da Doação" required>
+
+        <label>Tipo de Exame:</label>
+        <input type="text" id="exaTipo" placeholder="Ex: Sorologia / HIV / Hepatite" required>
+
+        <label>Resultado:</label>
+        <input type="text" id="exaResultado" placeholder="Ex: Negativo / Aprovado" required>
+
+        <label>Observações:</label>
+        <input type="text" id="exaObservacoes" placeholder="Observações médicas">
+
+        <button type="submit">Salvar Exame</button>
+    </form>
+
+    <hr>
+
+    <h4>Lista de Exames Registrados</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tipo</th>
+                <th>Resultado</th>
+                <th>Data</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="tabela-exames">
+            <!-- Preenchido via JS -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    async function carregarExames() {
+        try {
+            const response = await fetch('/api/exames');
+            if (!response.ok) return;
+            const exames = await response.json();
+
+            const tbody = document.getElementById('tabela-exames');
+            tbody.innerHTML = '';
+
+            exames.forEach(ex => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${ex.exaId}</td>
+                    <td>${ex.exaTipo}</td>
+                    <td><strong>${ex.exaResultado}</strong></td>
+                    <td>${ex.exaData ? new Date(ex.exaData).toLocaleDateString() : 'N/A'}</td>
+                    <td>
+                        <button onclick="deletarExame(${ex.exaId})" style="background-color: #d9534f; color: white;">Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch (error) {
+            console.error("Erro ao carregar exames:", error);
+        }
+    }
+
+    document.getElementById('form-exame').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const exame = {
+            doacao: { doaId: parseInt(document.getElementById('doaId').value) },
+            exaTipo: document.getElementById('exaTipo').value,
+            exaResultado: document.getElementById('exaResultado').value,
+            exaData: new Date().toISOString(),
+            exaObservacoes: document.getElementById('exaObservacoes').value
+        };
+
+        const response = await fetch('/api/exames', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(exame)
+        });
+
+        if (response.ok) {
+            alert('Exame cadastrado com sucesso!');
+            document.getElementById('form-exame').reset();
+            carregarExames();
+        } else {
+            alert('Erro ao salvar exame.');
+        }
+    });
+
+    async function deletarExame(id) {
+        if (confirm('Tem certeza que deseja excluir este exame?')) {
+            const response = await fetch(`/api/exames/${id}`, { method: 'DELETE' });
+            if (response.ok) {
+                alert('Exame excluído com sucesso!');
+                carregarExames();
+            } else {
+                alert('Erro ao excluir exame.');
+            }
+        }
+    }
+
+    carregarExames();
+</script>

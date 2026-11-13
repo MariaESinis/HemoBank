@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HemogloBank - Banco de Sangue</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background-color: #f4f6f9; color: #333; line-height: 1.6; }
+        header { background-color: #b71c1c; color: white; padding: 20px 0; text-align: center; }
+        header h1 { font-size: 2.2rem; }
+        nav { display: flex; justify-content: center; gap: 15px; margin-top: 10px; }
+        nav a { color: white; text-decoration: none; font-weight: bold; padding: 5px 15px; border-radius: 4px; background-color: rgba(255,255,255,0.2); }
+        nav a:hover { background-color: rgba(255,255,255,0.4); }
+        
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .card h2 { color: #b71c1c; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 8px; }
+        
+        .grid-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .info-box { background: #fff8f8; border-left: 4px solid #b71c1c; padding: 15px; border-radius: 4px; }
+        .info-box h3 { margin-bottom: 8px; color: #b71c1c; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8d7da; color: #721c24; }
+        tr:hover { background-color: #f1f1f1; }
+        
+        .status-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.85rem; }
+        .status-normal { background: #d4edda; color: #155724; }
+        .status-critico { background: #f8d7da; color: #721c24; }
+
+        footer { text-align: center; padding: 20px; background-color: #333; color: white; margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>HemogloBank</h1>
+        <p>Sistema de Gestão de Doação de Sangue</p>
+        <nav>
+            <a href="/">Início</a>
+            <a href="/login">Entrar</a>
+            <a href="/cadastro">Cadastrar-se</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Seção de Conscientização/Informação ao Visitante -->
+        <div class="card">
+            <h2>Como Funciona a Doação?</h2>
+            <div class="grid-info">
+                <div class="info-box">
+                    <h3>1. Requisitos Básicos</h3>
+                    <p>Ter entre 16 e 69 anos, pesar no mínimo 50kg, estar descansado e apresentar documento oficial com foto.</p>
+                </div>
+                <div class="info-box">
+                    <h3>2. Cadastro e Triagem</h3>
+                    <p>Cadastre-se no sistema, agende seu horário e passe por uma entrevista médica rápida no dia da coleta.</p>
+                </div>
+                <div class="info-box">
+                    <h3>3. A Coleta</h3>
+                    <p>O processo leva em média 15 minutos, utilizando material 100% descartável com total segurança.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela do Estoque em Tempo Real -->
+        <div class="card">
+            <h2>Situação Atual do Estoque de Sangue</h2>
+            <p>Confira os níveis disponíveis no nosso hemocentro em tempo real:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tipagem Sanguínea</th>
+                        <th>Componente</th>
+                        <th>Quantidade Disponível</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-estoque-publico">
+                    <tr>
+                        <td colspan="4" style="text-align: center;">Carregando informações do estoque...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 HemogloBank - Salve Vidas. Doe Sangue.</p>
+    </footer>
+
+    <script>
+        async function carregarEstoquePublico() {
+            try {
+                const response = await fetch('/api/estoque');
+                const tbody = document.getElementById('tabela-estoque-publico');
+                
+                if (!response.ok || response.status === 24) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhum registro encontrado no estoque.</td></tr>';
+                    return;
+                }
+                
+                const estoques = await response.json();
+                tbody.innerHTML = '';
+
+                if (estoques.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhum registro no estoque no momento.</td></tr>';
+                    return;
+                }
+
+                estoques.forEach(est => {
+                    const tr = document.createElement('tr');
+                    const statusClass = (est.estStatus && est.estStatus.toLowerCase().includes('crítico')) ? 'status-critico' : 'status-normal';
+                    
+                    tr.innerHTML = `
+                        <td><strong>${est.estTipagem || 'N/A'}</strong></td>
+                        <td>${est.estTipo || 'Sangue Total'}</td>
+                        <td>${est.estQuantidade || 0} bolsas</td>
+                        <td><span class="status-badge ${statusClass}">${est.estStatus || 'Estável'}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error("Erro ao buscar estoque:", error);
+                document.getElementById('tabela-estoque-publico').innerHTML = 
+                    '<tr><td colspan="4" style="text-align: center; color: red;">Não foi possível carregar os dados do estoque no momento.</td></tr>';
+            }
+        }
+
+        // Executa ao carregar a página
+        carregarEstoquePublico();
+    </script>
+</body>
+</html>
