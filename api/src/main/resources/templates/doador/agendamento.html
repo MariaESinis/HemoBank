@@ -1,0 +1,48 @@
+<div class="card">
+    <h3>Agendar Nova Coleta de Sangue</h3>
+    <form id="form-agendamento">
+        <label>ID do Doador:</label>
+        <input type="number" id="dorId" placeholder="Digite seu ID de doador" required>
+
+        <label>Data da Coleta:</label>
+        <input type="date" id="ageData" required>
+
+        <label>Horário:</label>
+        <input type="time" id="ageHorario" required>
+
+        <label>Observações:</label>
+        <input type="text" id="ageObservacoes" placeholder="Alguma observação relevante?">
+
+        <button type="submit">Confirmar Agendamento</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('form-agendamento').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Formatando data e horário para LocalDateTime do Java
+        const dataStr = document.getElementById('ageData').value;
+        const horaStr = document.getElementById('ageHorario').value;
+
+        const agendamento = {
+            doador: { dorId: parseInt(document.getElementById('dorId').value) },
+            ageData: `${dataStr}T00:00:00`,
+            ageHorario: `${dataStr}T${horaStr}:00`,
+            ageObservacoes: document.getElementById('ageObservacoes').value
+        };
+
+        const response = await fetch('/api/agendamentos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(agendamento)
+        });
+
+        if (response.ok) {
+            alert('Agendamento realizado com sucesso!');
+            document.getElementById('form-agendamento').reset();
+        } else {
+            alert('Erro ao realizar agendamento. Verifique o ID do doador.');
+        }
+    });
+</script>

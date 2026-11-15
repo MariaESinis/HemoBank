@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel do Doador - Hemoglobank</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta charset="UTF-8">
+</head>
+<body>
+    <header>
+        <h1>Bem-vindo ao Painel do Doador</h1>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Sair</button>
+        </form>
+    </header>
+
+    <main class="container">
+        <section class="meus-agendamentos" style="margin-top: 30px;">
+    <h2>Meus Agendamentos</h2>
+    <table border="1" cellpadding="10" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th>Data</th>
+                <th>Horário</th>
+                <th>Observações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="ag : ${agendamentos}">
+                <td th:text="${ag.ageData}">Data</td>
+                <td th:text="${ag.ageHorario}">Horário</td>
+                <td th:text="${ag.ageObservacoes}">Observações</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(agendamentos)}">
+                <td colspan="3" style="text-align: center;">Nenhum agendamento encontrado.</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<section class="solicitacao-exames" style="margin-top: 30px;">
+    <h2>Solicitar Novo Exame</h2>
+    <form th:action="@{/doador/exame/solicitar}" method="post" style="display: flex; gap: 10px; margin-top: 10px;">
+        <select name="tipo" style="padding: 8px; flex-grow: 1;">
+            <option value="Hemograma Completo">Hemograma Completo</option>
+            <option value="Sorologia (HIV/Hepatite)">Sorologia (HIV / Hepatites)</option>
+            <option value="Tipagem Sanguínea">Tipagem Sanguínea</option>
+            <option value="Glicemia">Glicemia</option>
+        </select>
+        <button type="submit" style="padding: 8px 15px; background-color: #d9534f; color: white; border: none; cursor: pointer;">Solicitar Exame</button>
+    </form>
+</section>
+
+<section class="meus-exames" style="margin-top: 30px;">
+    <h2>Meus Exames Solicitados</h2>
+    <table border="1" cellpadding="10" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th>Tipo de Exame</th>
+                <th>Status</th>
+                <th>Resultado / Observação Médica</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="ex : ${exames}">
+                <td th:text="${ex.tipo}">Tipo</td>
+                <td>
+                    <span th:text="${ex.status}" style="font-weight: bold; color: #d9534f;">SOLICITADO</span>
+                </td>
+                <td th:text="${ex.resultado != null && !ex.resultado.isEmpty() ? ex.resultado : 'Aguardando avaliação'}">Resultado</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(exames)}">
+                <td colspan="3" style="text-align: center;">Nenhum exame solicitado.</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+
+<div class="dashboard-cards" style="display: flex; gap: 20px; margin-top: 20px; margin-bottom: 30px;">
+    
+    <!-- Card de Status de Doação -->
+    <div style="flex: 1; padding: 20px; background-color: #f8f9fa; border-left: 5px solid #d9534f; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h3>Status de Aptidão</h3>
+        <p style="margin-top: 10px; font-size: 16px;">
+            <span th:if="${podeDoar}" style="color: #28a745; font-weight: bold;">✔ Você está apto(a) para agendar uma doação hoje!</span>
+            <span th:unless="${podeDoar}" style="color: #d9534f; font-weight: bold;">⏳ Aguardando intervalo entre doações.</span>
+        </p>
+        <p style="margin-top: 5px; color: #555;">
+            Próxima data permitida: <strong th:text="${#temporals.format(proximaDoacao, 'dd/MM/yyyy')}">10/06/2026</strong>
+        </p>
+    </div>
+
+    <!-- Card de Dados do Doador -->
+    <div style="flex: 1; padding: 20px; background-color: #f8f9fa; border-left: 5px solid #0275d8; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h3>Meus Dados</h3>
+        <p style="margin-top: 10px;"><strong>Nome:</strong> <span th:text="${doador.dorNome}">Nome do Doador</span></p>
+        <p><strong>E-mail:</strong> <span th:text="${usuario.email}">email@email.com</span></p>
+        <p><strong>Sexo:</strong> <span th:text="${doador.dorSexo}">Masculino</span></p>
+    </div>
+
+</div>
+    </main>
+
+    <script>
+        document.getElementById('formAgendamento').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const dataHora = document.getElementById('dataHora').value;
+
+            const response = await fetch('/api/agendamentos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dataHora: dataHora })
+            });
+
+            if (response.ok) {
+                alert('Agendamento realizado com sucesso!');
+                location.reload();
+            } else {
+                alert('Erro ao realizar agendamento.');
+            }
+        });
+    </script>
+</body>
+</html>
