@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <meta charset="UTF-8">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel do Doador</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+        .btn-logout { background-color: #555; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Área Exclusiva do MEDICO 🩸</h1>
+        <a href="/hemocentro/logout" class="btn-logout">Sair</a>
+    </div>
+    <h3>Olá! Aqui você pode:</h3>
+    <ul>
+        <li>Ver seu histórico de doações</li>
+    </ul>
+
+    <div class="card">
+    <h3>Cadastrar Nova Bolsa de Sangue</h3>
+   <form th:action="@{/medico/bolsa/cadastrar}" method="post" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 10px;">
+    <input type="text" name="cpfDoador" placeholder="CPF do Doador (ex: 12345678954)" required style="padding: 5px;" />
+    <select name="tipagem" style="padding: 5px;">
+        <option value="O+">O+</option>
+        <option value="O-">O-</option>
+        <option value="A+">A+</option>
+        <option value="A-">A-</option>
+        <option value="B+">B+</option>
+        <option value="B-">B-</option>
+        <option value="AB+">AB+</option>
+        <option value="AB-">AB-</option>
+    </select>
+    <select name="componente" style="padding: 5px;">
+        <option value="SANGUE_TOTAL">Sangue Total</option>
+        <option value="PLAQUETAS">Plaquetas</option>
+        <option value="PLASMA">Plasma</option>
+    </select>
+    <input type="number" name="quantidade" placeholder="Qtd (ml)" value="450" style="padding: 5px; width: 90px;" />
+    <input type="date" name="validade" required style="padding: 5px;" />
+    <button type="submit" style="padding: 6px 12px; background-color: #d9534f; color: white; border: none; cursor: pointer;">Cadastrar Bolsa</button>
+</form>
+
+    <section class="exames-medico" style="margin-top: 40px;">
+    <h2>Exames Solicitados pelos Doadores</h2>
+    <table border="1" cellpadding="10" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th>Doador</th>
+                <th>Tipo de Exame</th>
+                <th>Status Atual</th>
+                <th>Ações e Resultado Médico</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="ex : ${exames}">
+                <td th:text="${ex.doador != null ? ex.doador.dorNome : 'Desconhecido'}">Doador</td>
+                <td th:text="${ex.tipo}">Tipo</td>
+                <td>
+                    <span th:text="${ex.status}" style="font-weight: bold; color: #d9534f;">SOLICITADO</span>
+                </td>
+                <td>
+                    <form th:action="@{/medico/exame/atualizar/{id}(id=${ex.id})}" method="post" style="display: flex; gap: 10px; align-items: center;">
+                        <select name="status" style="padding: 5px;">
+                            <option value="SOLICITADO" th:selected="${ex.status == 'SOLICITADO'}">Solicitado</option>
+                            <option value="EM_ANALISE" th:selected="${ex.status == 'EM_ANALISE'}">Em Análise</option>
+                            <option value="CONCLUIDO" th:selected="${ex.status == 'CONCLUIDO'}">Concluído</option>
+                            <option value="CANCELADO" th:selected="${ex.status == 'CANCELADO'}">Cancelado</option>
+                        </select>
+                        <input type="text" name="resultado" th:value="${ex.resultado}" placeholder="Resultado / Observação..." style="padding: 5px; flex-grow: 1;" />
+                        <button type="submit" style="padding: 5px 10px; background-color: #28a745; color: white; border: none; cursor: pointer;">Salvar</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(exames)}">
+                <td colspan="4" style="text-align: center;">Nenhum exame cadastrado no sistema.</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+    <section class="agendamentos-medico" style="margin-top: 30px;">
+    <h2>Agendamentos de Doação no Sistema</h2>
+    <table border="1" cellpadding="10" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th>Doador</th>
+                <th>Data / Horário</th>
+                <th>Status Atual</th>
+                <th>Ações e Observações Médicas</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="ag : ${agendamentos}">
+                <td th:text="${ag.doador != null ? ag.doador.dorNome : 'Desconhecido'}">Nome</td>
+                <td>
+                    <span th:text="${ag.ageData}">Data</span> - <span th:text="${ag.ageHorario}">Horário</span>
+                </td>
+                <td>
+                    <span th:text="${ag.ageStatus}" style="font-weight: bold; color: #0066cc;">PENDENTE</span>
+                </td>
+                <td>
+                    <!-- Formulário para atualizar status e observações de forma isolada por agendamento -->
+                    <form th:action="@{/medico/agendamento/atualizar/{id}(id=${ag.id})}" method="post" style="display: flex; gap: 10px; align-items: center;">
+                        <select name="status" style="padding: 5px;">
+                            <option value="PENDENTE" th:selected="${ag.ageStatus == 'PENDENTE'}">Pendente</option>
+                            <option value="APROVADO" th:selected="${ag.ageStatus == 'APROVADO'}">Aprovado</option>
+                            <option value="CONCLUIDO" th:selected="${ag.ageStatus == 'CONCLUIDO'}">Concluído</option>
+                            <option value="CANCELADO" th:selected="${ag.ageStatus == 'CANCELADO'}">Cancelado</option>
+                        </select>
+                        <input type="text" name="observacoes" th:value="${ag.ageObservacoes}" placeholder="Observação médica..." style="padding: 5px; flex-grow: 1;" />
+                        <button type="submit" style="padding: 5px 10px; background-color: #28a745; color: white; border: none; cursor: pointer;">Salvar</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(agendamentos)}">
+                <td colspan="4" style="text-align: center;">Nenhum agendamento cadastrado.</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+</div>
+
+<script>
+    document.getElementById('form-bolsa').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const novaBolsa = {
+            tipagem: document.getElementById('tipagem').value,
+            quantidadeMl: parseInt(document.getElementById('quantidadeMl').value),
+            dataColeta: new Date().toISOString(),
+            dataValidade: new Date(document.getElementById('dataValidade').value).toISOString(),
+            observacoes: document.getElementById('observacoes').value
+        };
+
+        const response = await fetch('/api/bolsas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(novaBolsa)
+        });
+
+        if (response.ok) {
+            alert('Bolsa cadastrada com sucesso!');
+            document.getElementById('form-bolsa').reset();
+        } else {
+            alert('Erro ao cadastrar bolsa.');
+        }
+    });
+</script>
+</body>
+</html>
