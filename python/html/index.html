@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments/layout :: head('Banco de Sangue')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: topoPublico}"></header>
+
+<main class="container">
+    <section class="card">
+        <h2>Como funciona a doação?</h2>
+        <div class="grid">
+            <div class="caixa">
+                <h3>1. Requisitos básicos</h3>
+                <p>Ter entre 16 e 69 anos, pesar no mínimo 50 kg, estar descansado e apresentar documento oficial com foto.</p>
+            </div>
+            <div class="caixa">
+                <h3>2. Cadastro e triagem</h3>
+                <p>Cadastre-se no sistema, agende seu horário e passe por uma entrevista médica rápida no dia da coleta.</p>
+            </div>
+            <div class="caixa">
+                <h3>3. A coleta</h3>
+                <p>O processo leva em média 15 minutos, utilizando material 100% descartável, com total segurança.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Situação atual do estoque de sangue</h2>
+        <div class="tabela-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tipagem sanguínea</th>
+                        <th>Bolsas disponíveis</th>
+                        <th>Situação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="n : ${niveisEstoque}">
+                        <td><strong th:text="${n.tipagem()}">O+</strong></td>
+                        <td th:text="${n.bolsas()}">12</td>
+                        <td>
+                            <span class="badge" th:classappend="${'badge-' + n.nivel().css}"
+                                  th:text="${n.nivel().rotulo}">Abastecido</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="legenda" style="margin-top: 10px;">
+            Conta apenas bolsas disponíveis e dentro da validade.
+            Crítico: menos de 3 bolsas · Estável: de 3 a 9 · Abastecido: 10 ou mais.
+        </p>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+</body>
+</html>
