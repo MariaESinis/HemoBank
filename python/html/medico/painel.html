@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments/layout :: head('Painel do médico')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: topoMedico}"></header>
+
+<main class="container">
+    <div th:replace="~{fragments/layout :: mensagens}"></div>
+
+    <section class="card">
+        <h2>Cadastrar nova bolsa de sangue</h2>
+        <form th:action="@{/medico/bolsa/cadastrar}" method="post" class="linha-form">
+            <div>
+                <label for="cpfDoador">CPF do doador</label>
+                <input type="text" id="cpfDoador" name="cpfDoador" inputmode="numeric" placeholder="Somente números" required>
+            </div>
+            <div>
+                <label for="tipagem">Tipagem</label>
+                <select id="tipagem" name="tipagem">
+                    <option th:each="t : ${tipagens}" th:value="${t}" th:text="${t}">O+</option>
+                </select>
+            </div>
+            <div>
+                <label for="componente">Componente</label>
+                <select id="componente" name="componente">
+                    <option th:each="c : ${componentes}" th:value="${c}" th:text="${c.rotulo}">Sangue total</option>
+                </select>
+            </div>
+            <div>
+                <label for="quantidade">Quantidade (ml)</label>
+                <input type="number" id="quantidade" name="quantidade" value="450" min="1" max="1000" required>
+            </div>
+            <div>
+                <label for="validade">Validade</label>
+                <input type="date" id="validade" name="validade" required th:attr="min=${hoje}">
+            </div>
+            <button type="submit" class="btn">Cadastrar bolsa</button>
+        </form>
+
+        <h3 style="margin-top: 24px;">Últimas bolsas cadastradas</h3>
+        <div class="tabela-wrap">
+            <table>
+                <thead>
+                    <tr><th>Doador</th><th>Tipagem</th><th>Componente</th><th>Qtd (ml)</th><th>Validade</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="b : ${bolsas}">
+                        <td th:text="${b.doador?.dorNome}">Doador</td>
+                        <td><strong th:text="${b.tipagem}">O+</strong></td>
+                        <td th:text="${b.componente.rotulo}">Sangue total</td>
+                        <td th:text="${b.quantidade}">450</td>
+                        <td th:text="${#temporals.format(b.validade, 'dd/MM/yyyy')}">01/01/2027</td>
+                        <td><span class="badge" th:classappend="${'badge-' + b.status.css}" th:text="${b.status.rotulo}">Disponível</span></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(bolsas)}">
+                        <td colspan="6" class="vazio">Nenhuma bolsa cadastrada.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Agendamentos de doação</h2>
+        <div class="tabela-wrap">
+            <table>
+                <thead>
+                    <tr><th>Doador</th><th>Data / horário</th><th>Status</th><th>Atualizar</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="ag : ${agendamentos}">
+                        <td th:text="${ag.doador?.dorNome}">Nome</td>
+                        <td>
+                            <span th:text="${#temporals.format(ag.ageData, 'dd/MM/yyyy')}">10/11/2026</span>
+                            às <span th:text="${#temporals.format(ag.ageHorario, 'HH:mm')}">09:00</span>
+                        </td>
+                        <td><span class="badge" th:classappend="${'badge-' + ag.ageStatus.css}" th:text="${ag.ageStatus.rotulo}">Pendente</span></td>
+                        <td>
+                            <form th:action="@{/medico/agendamento/atualizar/{id}(id=${ag.id})}" method="post" class="form-inline">
+                                <select name="status" aria-label="Status">
+                                    <option th:each="s : ${statusAgendamento}" th:value="${s}"
+                                            th:text="${s.rotulo}" th:selected="${s == ag.ageStatus}">Pendente</option>
+                                </select>
+                                <input type="text" name="observacoes" th:value="${ag.ageObservacoes}"
+                                       maxlength="500" placeholder="Observação médica...">
+                                <button type="submit" class="btn sucesso pequeno">Salvar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(agendamentos)}">
+                        <td colspan="4" class="vazio">Nenhum agendamento cadastrado.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="legenda" style="margin-top: 10px;">
+            Ao marcar um agendamento como <strong>Concluído</strong>, a doação é registrada e a próxima data
+            permitida do doador é recalculada.
+        </p>
+    </section>
+
+    <section class="card">
+        <h2>Exames solicitados pelos doadores</h2>
+        <div class="tabela-wrap">
+            <table>
+                <thead>
+                    <tr><th>Doador</th><th>Tipo de exame</th><th>Status</th><th>Atualizar</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="ex : ${exames}">
+                        <td th:text="${ex.doador?.dorNome}">Doador</td>
+                        <td th:text="${ex.tipo}">Tipo</td>
+                        <td><span class="badge" th:classappend="${'badge-' + ex.status.css}" th:text="${ex.status.rotulo}">Solicitado</span></td>
+                        <td>
+                            <form th:action="@{/medico/exame/atualizar/{id}(id=${ex.id})}" method="post" class="form-inline">
+                                <select name="status" aria-label="Status">
+                                    <option th:each="s : ${statusExame}" th:value="${s}"
+                                            th:text="${s.rotulo}" th:selected="${s == ex.status}">Solicitado</option>
+                                </select>
+                                <input type="text" name="resultado" th:value="${ex.resultado}"
+                                       maxlength="500" placeholder="Resultado / observação...">
+                                <button type="submit" class="btn sucesso pequeno">Salvar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(exames)}">
+                        <td colspan="4" class="vazio">Nenhum exame cadastrado no sistema.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+</body>
+</html>
