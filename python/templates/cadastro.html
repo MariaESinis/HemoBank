@@ -1,9 +1,10 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
-<head th:replace="~{fragments/layout :: head('Cadastro de doador')}"></head>
-<body>
-<header th:replace="~{fragments/layout :: topoPublico}"></header>
+{% extends "layout.html" %}
 
+{% block titulo %}Cadastro de doador{% endblock %}
+
+{% block topo %}{% include "_topo_publico.html" %}{% endblock %}
+
+{% block conteudo %}
 <main class="container estreito">
     <section class="card">
         <h2>Cadastro de doador</h2>
@@ -47,14 +48,12 @@
         </form>
 
         <p style="margin-top: 16px; text-align: center;">
-            Já tem conta? <a th:href="@{/login}">Entrar</a>
+            Já tem conta? <a href="{{ url_for('login') }}">Entrar</a>
         </p>
     </section>
 </main>
 
-<footer th:replace="~{fragments/layout :: rodape}"></footer>
-
-<script th:inline="none">
+<script>
     const form = document.getElementById('form-cadastro');
     const caixaMensagem = document.getElementById('mensagem');
     const botao = document.getElementById('botao');
@@ -87,14 +86,14 @@
 
         botao.disabled = true;
         try {
-            const resposta = await fetch('/api/cadastro/doador', {
+            const resposta = await fetch("{{ url_for('api_cadastro_doador') }}", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dto)
             });
 
             if (resposta.status === 201) {
-                window.location.href = '/login?cadastro';
+                window.location.href = "{{ url_for('login', cadastro=1) }}";
                 return;
             }
 
@@ -116,5 +115,4 @@
         }
     });
 </script>
-</body>
-</html>
+{% endblock %}

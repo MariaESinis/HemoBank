@@ -1,9 +1,10 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
-<head th:replace="~{fragments/layout :: head('Banco de Sangue')}"></head>
-<body>
-<header th:replace="~{fragments/layout :: topoPublico}"></header>
+{% extends "layout.html" %}
 
+{% block titulo %}Banco de Sangue{% endblock %}
+
+{% block topo %}{% include "_topo_publico.html" %}{% endblock %}
+
+{% block conteudo %}
 <main class="container">
     <section class="card">
         <h2>Como funciona a doação?</h2>
@@ -35,24 +36,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="n : ${niveisEstoque}">
-                        <td><strong th:text="${n.tipagem()}">O+</strong></td>
-                        <td th:text="${n.bolsas()}">12</td>
+                    {% for n in niveis_estoque %}
+                    <tr>
+                        <td><strong>{{ n.tipagem }}</strong></td>
+                        <td>{{ n.bolsas }}</td>
                         <td>
-                            <span class="badge" th:classappend="${'badge-' + n.nivel().css}"
-                                  th:text="${n.nivel().rotulo}">Abastecido</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <p class="legenda" style="margin-top: 10px;">
-            Conta apenas bolsas disponíveis e dentro da validade.
-            Crítico: menos de 3 bolsas · Estável: de 3 a 9 · Abastecido: 10 ou mais.
-        </p>
-    </section>
-</main>
-
-<footer th:replace="~{fragments/layout :: rodape}"></footer>
-</body>
-</html>
+                            <span class="badge badge-{{

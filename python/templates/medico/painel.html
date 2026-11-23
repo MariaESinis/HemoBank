@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block titulo %}Painel do médico{% endblock %}
+
+{% block topo %}{% include "_topo_medico.html" %}{% endblock %}
+
+{% block conteudo %}
+<main class="container">
+
+    <section class="card">
+        <h2>Cadastrar nova bolsa de sangue</h2>
+        <form action="{{ url_for('cadastrar_bolsa') }}" method="post" class="linha-form">
+            <div>
+                <label for="cpfDoador">CPF do doador</label>
+                <input type="text" id="cpfDoador" name="cpfDoador" inputmode="numeric" placeholder="Somente números" required>
+            </div>
+            <div>
+                <label for="tipagem">Tipagem</label>
+                <select id="tipagem" name="tipagem">
+                    {% for t in tipagens %}
+                    <option value="{{ t }}">{{ t }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="componente">Componente</label>
+                <select id="componente" name="componente">
+                    {% for c in componentes %}
+                    <option value="{{ c.valor }}">{{ c.rotulo }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="quantidade">Quantidade (ml)</label>
+                <input type="number" id="quantidade" name="quantidade" value="450" min="1" max="1000" required>
+            </div>
+            <div>
+                <label for="validade">Validade</label>
+                <input type="date" id="validade" name="validade" required min="{{ hoje }}">
+            </div>
+            <button type="submit"

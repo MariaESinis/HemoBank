@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block titulo %}HemogloBank{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    {% block topo %}{% endblock %}
+
+    {# Mensagens enviadas pelo flash() nas rotas #}
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% if mensagens %}
+        <div class="container">
+            {% for categoria, texto in mensagens %}
+            <div class="alerta {{ categoria }}">{{ texto }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block conteudo %}{% endblock %}
+
+    <footer>
+        <p>&copy; 2026 HemogloBank - Salve vidas. Doe sangue.</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block titulo %}Agendar doação{% endblock %}
+
+{% block topo %}{% include "_topo_doador.html" %}{% endblock %}
+
+{% block conteudo %}
+<main class="container estreito">
+    <section class="card">
+        <h2>Agendar nova coleta de sangue</h2>
+
+        {% if doador and not pode_doar and proxima_doacao %}
+        <div class="alerta info">
+            Você poderá doar novamente a partir de
+            <strong>{{ proxima_doacao.strftime('%d/%m/%Y') }}</strong>.
+            Escolha uma data a partir de então.
+        </div>
+        {% endif %}
+
+        {% if doador %}
+        {# O doador é identificado pelo login; não é preciso informar nenhum ID #}
+        <form action="{{ url_for('agendamento') }}" method="post">
+            <label for="data">Data da coleta</label>
+            <input type="date" id="data" name="data" required
+                   min="{{ proxima_doacao.isoformat() if proxima_doacao else hoje }}">
+
+            <label for="horario">Horário</label>
+            <input type="time" id="horario" name="horario" required>
+
+            <label for="observacoes">Observações (opcional)</label>
+            <input type="text" id="observacoes" name="observacoes" maxlength="500"
+                   placeholder="Alguma informação relevante para a equipe?">
+
+            <button type="submit" class="btn bloco">Confirmar agendamento</button>
+        </form>
+        {% else %}
+        <div class="alerta erro">
+            Não encontramos um cadastro de doador associado à sua conta.
+        </div>
+        {% endif %}
+
+        <p style="margin-top: 16px; text-align: center;">
+            <a href="{{ url_for('painel_doador') }}">← Voltar ao painel</a>
+        </p>
+    </section>
+</main>
+{% endblock %}
