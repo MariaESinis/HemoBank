@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments/layout :: head('Relatórios')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: topoGestor}"></header>
+
+<main class="container">
+    <h1 style="margin-bottom: 18px;">Relatórios</h1>
+
+    <section class="card">
+        <h2>Bolsas que vencem nos próximos 7 dias</h2>
+        <div class="tabela-wrap" id="bolsas"><p class="msg-carga">Carregando...</p></div>
+    </section>
+
+    <section class="card">
+        <h2>Doações detalhadas</h2>
+        <div class="tabela-wrap" id="doacoes"><p class="msg-carga">Carregando...</p></div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+
+<script th:inline="none">
+    // Monta a tabela a partir das colunas que vierem do banco (nome da coluna = cabeçalho).
+    function mensagem(el, texto, erro) {
+        el.replaceChildren();
+        const p = document.createElement('p');
+        p.className = 'msg-carga';
+        p.textContent = texto;
+        if (erro) p.style.color = '#b71c1c';
+        el.appendChild(p);
+    }
+
+    function renderTabela(el, linhas) {
+        if (!linhas.length) { mensagem(el, 'Nenhum registro.'); return; }
+        const colunas = Object.keys(linhas[0]);
+        const table = document.createElement('table');
+        const cab = table.createTHead().insertRow();
+        colunas.forEach(function (c) {
+            const th = document.createElement('th');
+            th.textContent = c.replace(/_/g, ' ');
+            cab.appendChild(th);
+        });
+        const corpo = table.createTBody();
+        linhas.forEach(function (linha) {
+            const tr = corpo.insertRow();
+            colunas.forEach(function (c) {
+                tr.insertCell().textContent = (linha[c] === null) ? '—' : linha[c];  // textContent: sem XSS
+            });
+        });
+        el.replaceChildren(table);
+    }
+
+    async function carregar(id, url) {
+        const el = document.getElementById(id);
+        try {
+            const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            renderTabela(el, await resp.json());
+        } catch (e) {
+            console.error(url, e);
+            mensagem(el, 'Não foi possível carregar este relatório.', true);
+        }
+    }
+
+    carregar('bolsas', '/api/relatorios/bolsas-a-vencer');
+    carregar('doacoes', '/api/relatorios/doacoes?limite=200');
+</script>
+</body>
+</html>

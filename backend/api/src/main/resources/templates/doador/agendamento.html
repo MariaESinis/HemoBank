@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments/layout :: head('Agendar doação')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: topoDoador}"></header>
+
+<main class="container estreito">
+    <div th:replace="~{fragments/layout :: mensagens}"></div>
+
+    <section class="card">
+        <h2>Agendar nova coleta de sangue</h2>
+
+        <div class="alerta info" th:if="${doador != null and !podeDoar}">
+            Você poderá doar novamente a partir de
+            <strong th:text="${#temporals.format(proximaDoacao, 'dd/MM/yyyy')}">10/06/2026</strong>.
+            Escolha uma data a partir de então.
+        </div>
+
+        <!-- O doador é identificado pelo login; não é preciso informar nenhum ID -->
+        <form th:action="@{/doador/agendamento}" method="post" th:if="${doador != null}">
+            <label for="data">Data da coleta</label>
+            <input type="date" id="data" name="data" required
+                   th:attr="min=${proximaDoacao != null ? proximaDoacao : hoje}">
+
+            <label for="horario">Horário</label>
+            <input type="time" id="horario" name="horario" required>
+
+            <label for="observacoes">Observações (opcional)</label>
+            <input type="text" id="observacoes" name="observacoes" maxlength="500"
+                   placeholder="Alguma informação relevante para a equipe?">
+
+            <button type="submit" class="btn bloco">Confirmar agendamento</button>
+        </form>
+
+        <div class="alerta erro" th:if="${doador == null}">
+            Não encontramos um cadastro de doador associado à sua conta.
+        </div>
+
+        <p style="margin-top: 16px; text-align: center;">
+            <a th:href="@{/doador/painel}">← Voltar ao painel</a>
+        </p>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments/layout :: head('Painel do doador')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: topoDoador}"></header>
+
+<main class="container">
+    <div th:replace="~{fragments/layout :: mensagens}"></div>
+
+    <div class="alerta erro" th:if="${doador == null}">
+        Não encontramos um cadastro de doador associado à sua conta. Entre em contato com o hemocentro.
+    </div>
+
+    <th:block th:if="${doador != null}">
+        <h1 style="margin-bottom: 18px;">Olá, <span th:text="${doador.dorNome}">Doador</span>!</h1>
+
+        <div class="grid" style="margin-bottom: 24px;">
+            <div class="caixa" th:classappend="${podeDoar} ? 'verde' : ''">
+                <h3>Status de aptidão</h3>
+                <p th:if="${podeDoar}"><strong style="color: #1e7e34;">✔ Você está apto(a) para doar hoje!</strong></p>
+                <p th:unless="${podeDoar}"><strong style="color: #b71c1c;">⏳ Aguardando o intervalo entre doações.</strong></p>
+                <p class="legenda">
+                    Próxima data permitida:
+                    <strong th:text="${#temporals.format(proximaDoacao, 'dd/MM/yyyy')}">10/06/2026</strong>
+                </p>
+                <p class="legenda" th:if="${doador.dorDataUltimaDoacao != null}">
+                    Última doação:
+                    <span th:text="${#temporals.format(doador.dorDataUltimaDoacao, 'dd/MM/yyyy')}">01/01/2026</span>
+                </p>
+                <p style="margin-top: 12px;">
+                    <a class="btn pequeno" th:href="@{/doador/agendamento}">Agendar doação</a>
+                </p>
+            </div>
+
+            <div class="caixa azul">
+                <h3>Meus dados</h3>
+                <p><strong>Nome:</strong> <span th:text="${doador.dorNome}">Nome</span></p>
+                <p><strong>E-mail:</strong> <span th:text="${doador.dorEmail}">email@email.com</span></p>
+                <p><strong>Sexo:</strong>
+                    <span th:text="${doador.dorSexo == 'M' ? 'Masculino' : (doador.dorSexo == 'F' ? 'Feminino' : doador.dorSexo)}">Masculino</span>
+                </p>
+            </div>
+        </div>
+
+        <section class="card">
+            <h2>Meus agendamentos</h2>
+            <div class="tabela-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Data</th><th>Horário</th><th>Status</th><th>Observações</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="ag : ${agendamentos}">
+                            <td th:text="${#temporals.format(ag.ageData, 'dd/MM/yyyy')}">10/11/2026</td>
+                            <td th:text="${#temporals.format(ag.ageHorario, 'HH:mm')}">09:00</td>
+                            <td><span class="badge" th:classappend="${'badge-' + ag.ageStatus.css}" th:text="${ag.ageStatus.rotulo}">Pendente</span></td>
+                            <td th:text="${ag.ageObservacoes}">Observações</td>
+                            <td>
+                                <form th:if="${ag.ageStatus.emAberto}" method="post"
+                                      th:action="@{/doador/agendamento/{id}/cancelar(id=${ag.id})}"
+                                      onsubmit="return confirm('Cancelar este agendamento?');">
+                                    <button type="submit" class="btn perigo pequeno">Cancelar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(agendamentos)}">
+                            <td colspan="5" class="vazio">Nenhum agendamento encontrado.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Solicitar novo exame</h2>
+            <form th:action="@{/doador/exame/solicitar}" method="post" class="form-inline">
+                <select name="tipo" aria-label="Tipo de exame">
+                    <option th:each="t : ${tiposExame}" th:value="${t}" th:text="${t}">Hemograma Completo</option>
+                </select>
+                <button type="submit" class="btn">Solicitar exame</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Meus exames</h2>
+            <div class="tabela-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Tipo de exame</th><th>Status</th><th>Resultado / observação médica</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="ex : ${exames}">
+                            <td th:text="${ex.tipo}">Tipo</td>
+                            <td><span class="badge" th:classappend="${'badge-' + ex.status.css}" th:text="${ex.status.rotulo}">Solicitado</span></td>
+                            <td th:text="${ex.resultado != null and !ex.resultado.isEmpty()} ? ${ex.resultado} : 'Aguardando avaliação'">Resultado</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(exames)}">
+                            <td colspan="3" class="vazio">Nenhum exame solicitado.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </th:block>
+</main>
+
+<footer th:replace="~{fragments/layout :: rodape}"></footer>
+</body>
+</html>
